@@ -259,8 +259,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 
     function getStream() {
-        if (window.stream) {
-            window.stream.getTracks().forEach(function (track) {
+        if (window.localStream) {
+            window.localStream.getTracks().forEach(function (track) {
                 track.stop();
             });
         }
