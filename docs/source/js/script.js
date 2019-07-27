@@ -208,10 +208,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
      * Initialize application by requesting your own video to test !
      */
     requestLocalVideo({
-        success: function(stream){
+        success: function (stream) {
+            
             window.localStream = stream;
             console.log(stream);
             onReceiveStream(stream, 'my-camera');
+            
         },
         error: function(err){
             alert("Cannot get access to your camera and video !");
