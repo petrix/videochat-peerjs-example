@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     document.getElementById("connect-to-peer-btn").addEventListener("click", function () {
         username = document.getElementById("name").value;
         peer_id = document.getElementById("peer_id").value;
-
+        console.log(username);
         if (peer_id) {
             conn = peer.connect(peer_id, {
                 metadata: {
