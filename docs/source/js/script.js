@@ -13,20 +13,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
      * The iceServers on this example are public and can be used for your project.
      */
     var peer = new Peer({
-        // host: "localhost",
-        // port: 9000,
+        host: 'https://p3xx.tk',
+        port: 9000,
         path: '/',
-        debug: 3,
-        config: {
-            'iceServers': [
-                { url: 'stun:stun1.l.google.com:19302' },
-                {
-                    url: 'turn:numb.viagenie.ca',
-                    credential: 'muazkh',
-                    username: 'webrtc@live.com'
-                }
-            ]
-        }
+        debug: 3
+        // path: '/',
+        // debug: 3,
+        // config: {
+        //     'iceServers': [
+        //         { url: 'stun:stun1.l.google.com:19302' },
+        //         {
+        //             url: 'turn:numb.viagenie.ca',
+        //             credential: 'muazkh',
+        //             username: 'webrtc@live.com'
+        //         }
+        //     ]
+        // }
     });
 
     // Once the initialization succeeds:
