@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var videoElement = document.querySelector('#my-camera');
     var audioSelect = document.querySelector('select#audioSource');
     var videoSelect = document.querySelector('select#videoSource');
-
+    audioSelect.onchange = getStream;
+    videoSelect.onchange = getStream;
     /**
      * Important: the host needs to be changed according to your requirements.
      * e.g if you want to access the Peer server from another device, the
