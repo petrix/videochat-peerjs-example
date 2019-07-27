@@ -180,7 +180,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log('Calling to ' + peer_id);
         console.log(peer);
 
-        var call = peer.call(peer_id, videoElement.srcObject);
+        // var call = peer.call(peer_id, videoElement.srcObject);
+        var call = peer.call(peer_id, window.localStream);
 
         call.on('stream', function (stream) {
             window.peer_stream = stream;
@@ -195,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     document.getElementById("connect-to-peer-btn").addEventListener("click", function () {
         username = document.getElementById("name").value;
         peer_id = document.getElementById("peer_id").value;
-        console.log(username);
+
         if (peer_id) {
             conn = peer.connect(peer_id, {
                 metadata: {
@@ -278,6 +279,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     function gotStream(stream) {
         window.stream = stream; // make stream available to console
+        window.localStream = stream;
         videoElement.srcObject = stream;
         console.log(stream);
         return stream;
