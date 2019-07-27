@@ -49,9 +49,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     // as the peer of the user that requested the connection.
     // 2.
     peer.on('connection', function (connection) {
-        if (username === ''||username==='undefined') {
-            username = Math.floor(Math.random() * 1000);
-        }
+
         conn = connection;
         peer_id = connection.peer;
 
@@ -199,6 +197,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
     document.getElementById("connect-to-peer-btn").addEventListener("click", function () {
         username = document.getElementById("name").value;
         peer_id = document.getElementById("peer_id").value;
+        if (username === ''||username===null) {
+            username = Math.floor(Math.random() * 1000);
+        }
 
         if (peer_id) {
             conn = peer.connect(peer_id, {
