@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log('Calling to ' + peer_id);
         console.log(peer);
 
-        var call = peer.call(peer_id, window.localStream);
+        var call = peer.call(peer_id, videoElement.srcObject);
 
         call.on('stream', function (stream) {
             window.peer_stream = stream;
