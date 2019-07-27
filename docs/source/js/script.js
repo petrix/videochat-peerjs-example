@@ -65,7 +65,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
      * Handle the on receive call event
      */
     peer.on('call', function (call) {
-        var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
+        // var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
+        var acceptsCall = true;
 
         if(acceptsCall){
             // Answer the call with your own video/audio stream
@@ -129,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         // If the message is yours, set text to right !
         if(data.from == username){
-            orientation = "text-right"
+            orientation = "text-right";
         }
 
         var messageHTML =  '<a href="javascript:void(0);" class="list-group-item' + orientation + '">';
