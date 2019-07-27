@@ -1,5 +1,7 @@
 # videochat-peerjs-example
 
+DEMO: https://petrix.github.io/videochat-peerjs-example/index.html
+
 A videochat implementation using PeerJS with Node.js
 
 # How to use
