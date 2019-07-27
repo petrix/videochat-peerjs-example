@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     document.getElementById("call").addEventListener("click", function () {
         console.log('Calling to ' + peer_id);
         console.log(peer);
+        peer.destroy();
 
         // var call = peer.call(peer_id, videoElement.srcObject);
         var call = peer.call(peer_id, window.localStream);
