@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     // Show the ID that allows other user to connect to your session.
     peer.on('open', function () {
         document.getElementById("peer-id-label").innerHTML = peer.id;
+        console.log(peer, peer.id);
     });
 
     // When someone connects to your session:
