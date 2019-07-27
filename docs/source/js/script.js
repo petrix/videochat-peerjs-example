@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     requestLocalVideo({
         success: function (stream) {
             navigator.mediaDevices.enumerateDevices()
-  .then(gotDevices).then(getStream).catch(handleError);
+                .then(gotDevices).then(getStream).catch(handleError);
             // window.localStream = stream;
             console.log(stream);
             onReceiveStream(stream, 'my-camera');
