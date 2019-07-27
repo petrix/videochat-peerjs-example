@@ -49,6 +49,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
     // as the peer of the user that requested the connection.
     // 2.
     peer.on('connection', function (connection) {
+        if (username === ''||username==='undefined') {
+            username = Math.floor(Math.random() * 1000);
+        }
         conn = connection;
         peer_id = connection.peer;
 
