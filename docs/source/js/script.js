@@ -280,6 +280,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         window.stream = stream; // make stream available to console
         videoElement.srcObject = stream;
         console.log(stream);
+        return stream;
     }
 
     function handleError(error) {
