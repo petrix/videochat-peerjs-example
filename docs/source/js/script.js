@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             // Handle when the call finishes
             call.on('close', function(){
-                alert("The videocall has finished");
+                console.log("The videocall has finished");
             });
 
             // use call.close() to finish a call
