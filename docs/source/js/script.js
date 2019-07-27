@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (username === ''||username===null) {
             username = Math.floor(Math.random() * 1000);
         }
-
+        console.log(username);
         if (peer_id) {
             conn = peer.connect(peer_id, {
                 metadata: {
