@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             // Receive data
             call.on('stream', function (stream) {
+                console.log(stream);
                 // Store a global reference of the other user stream
                 window.peer_stream = stream;
                 // Display the stream of the other user in the peer-camera video element !
@@ -209,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     requestLocalVideo({
         success: function(stream){
             window.localStream = stream;
+            console.log(stream);
             onReceiveStream(stream, 'my-camera');
         },
         error: function(err){
