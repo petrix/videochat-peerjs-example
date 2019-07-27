@@ -68,4 +68,5 @@ app.get('/', function (req, res) {
 });
 
 // Expose the css and js resources as "resources"
-app.use('/resources', express.static('./source'));
+// app.use('/resources', express.static('./source'));
+app.use('/source', express.static('./source'));
