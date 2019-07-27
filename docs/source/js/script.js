@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         port: 9000,
         path: '/',
         key: 'peerjs',
-        debug: 3
+        debug: 1
         // path: '/',
         // debug: 3,
         // config: {
