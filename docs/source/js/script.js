@@ -1,8 +1,12 @@
 // When the DOM is ready
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function (event) {
     var peer_id;
     var username;
     var conn;
+
+    var videoElement = document.querySelector('#my-camera');
+    var audioSelect = document.querySelector('select#audioSource');
+    var videoSelect = document.querySelector('select#videoSource');
 
     /**
      * Important: the host needs to be changed according to your requirements.
@@ -56,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         document.getElementById("connected_peer").innerHTML = connection.metadata.username;
     });
 
-    peer.on('error', function(err){
+    peer.on('error', function (err) {
         alert("An error ocurred with peer: " + err);
         console.error(err);
     });
@@ -68,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
         var acceptsCall = true;
 
-        if(acceptsCall){
+        if (acceptsCall) {
             // Answer the call with your own video/audio stream
             call.answer(window.localStream);
 
@@ -82,12 +86,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
             });
 
             // Handle when the call finishes
-            call.on('close', function(){
+            call.on('close', function () {
                 console.log("The videocall has finished");
             });
 
             // use call.close() to finish a call
-        }else{
+        } else {
             console.log("Call denied !");
         }
     });
@@ -102,7 +106,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
         // Request audio an video
-        navigator.getUserMedia({ audio: true, video: true }, callbacks.success , callbacks.error);
+        navigator.getUserMedia({
+            audio: true,
+            video: true
+        }, callbacks.success, callbacks.error);
     }
 
     /**
@@ -115,7 +122,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // Retrieve the video element according to the desired
         var video = document.getElementById(element_id);
         // Set the given stream as the video source
-        video.src = window.URL.createObjectURL(stream);
+        // video.src = window.URL.createObjectURL(stream);
+        video.srcObject = stream;
 
         // Store a global reference of the stream
         window.peer_stream = stream;
@@ -130,14 +138,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
         var orientation = "text-left";
 
         // If the message is yours, set text to right !
-        if(data.from == username){
+        if (data.from == username) {
             orientation = "text-right";
         }
 
-        var messageHTML =  '<a href="javascript:void(0);" class="list-group-item' + orientation + '">';
-                messageHTML += '<h4 class="list-group-item-heading">'+ data.from +'</h4>';
-                messageHTML += '<p class="list-group-item-text">'+ data.text +'</p>';
-            messageHTML += '</a>';
+        var messageHTML = '<a href="javascript:void(0);" class="list-group-item' + orientation + '">';
+        messageHTML += '<h4 class="list-group-item-heading">' + data.from + '</h4>';
+        messageHTML += '<p class="list-group-item-text">' + data.text + '</p>';
+        messageHTML += '</a>';
 
         document.getElementById("messages").innerHTML += messageHTML;
     }
@@ -145,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /**
      * Handle the send message button
      */
-    document.getElementById("send-message").addEventListener("click", function(){
+    document.getElementById("send-message").addEventListener("click", function () {
         // Get the text to send
         var text = document.getElementById("message").value;
 
@@ -167,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /**
      *  Request a videocall the other user
      */
-    document.getElementById("call").addEventListener("click", function(){
+    document.getElementById("call").addEventListener("click", function () {
         console.log('Calling to ' + peer_id);
         console.log(peer);
 
@@ -183,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /**
      * On click the connect button, initialize connection with peer
      */
-    document.getElementById("connect-to-peer-btn").addEventListener("click", function(){
+    document.getElementById("connect-to-peer-btn").addEventListener("click", function () {
         username = document.getElementById("name").value;
         peer_id = document.getElementById("peer_id").value;
 
@@ -195,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             });
 
             conn.on('data', handleMessage);
-        }else{
+        } else {
             alert("You need to provide a peer to connect with !");
             return false;
         }
@@ -209,15 +217,75 @@ document.addEventListener("DOMContentLoaded", function(event) {
      */
     requestLocalVideo({
         success: function (stream) {
-            
+            navigator.mediaDevices.enumerateDevices()
+  .then(gotDevices).then(getStream).catch(handleError);
             window.localStream = stream;
             console.log(stream);
             onReceiveStream(stream, 'my-camera');
-            
+
         },
-        error: function(err){
+        error: function (err) {
             alert("Cannot get access to your camera and video !");
             console.error(err);
         }
     });
+
+
+
+    function gotDevices(deviceInfos) {
+        for (var i = 0; i !== deviceInfos.length; ++i) {
+            var deviceInfo = deviceInfos[i];
+            var option = document.createElement('option');
+            option.value = deviceInfo.deviceId;
+            if (deviceInfo.kind === 'audioinput') {
+                option.text = deviceInfo.label ||
+                    'microphone ' + (audioSelect.length + 1);
+                audioSelect.appendChild(option);
+            } else if (deviceInfo.kind === 'videoinput') {
+                option.text = deviceInfo.label || 'camera ' +
+                    (videoSelect.length + 1);
+                videoSelect.appendChild(option);
+            } else {
+                console.log('Found one other kind of source/device: ', deviceInfo);
+            }
+        }
+    }
+
+    function getStream() {
+        if (window.stream) {
+            window.stream.getTracks().forEach(function (track) {
+                track.stop();
+            });
+        }
+
+        var constraints = {
+            audio: {
+                deviceId: {
+                    exact: audioSelect.value
+                }
+            },
+            video: {
+                deviceId: {
+                    exact: videoSelect.value
+                }
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).
+        then(gotStream).catch(handleError);
+    }
+
+    function gotStream(stream) {
+        window.stream = stream; // make stream available to console
+        videoElement.srcObject = stream;
+    }
+
+    function handleError(error) {
+        console.log('Error: ', error);
+    }
+
+
+
+
+
 }, false);
