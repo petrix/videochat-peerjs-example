@@ -228,7 +228,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
             navigator.mediaDevices.enumerateDevices()
                 .then(gotDevices).then(getStream).catch(handleError);
             // window.localStream = stream;
-            console.log(navigator.mediaDevices.enumerateDevices());
+            navigator.mediaDevices.enumerateDevices().then(function (result) {
+                console.log(result);
+            });
             console.log(navigator.mediaDevices.enumerateDevices()[0]);
             console.log(stream);
             onReceiveStream(stream, 'my-camera');
