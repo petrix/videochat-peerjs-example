@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
      * The iceServers on this example are public and can be used for your project.
      */
     var peer = new Peer({
-        host: 'p3xx.tk',
-        port: 9000,
+        host: 'p3xx.cf',
+        port: 4001,
         path: '/',
         key: 'peerjs',
         debug: 3
