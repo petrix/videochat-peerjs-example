@@ -193,7 +193,7 @@ document.getElementById("connect-to-peer-btn").addEventListener("click", functio
     username = document.getElementById("name").value;
     peer_id = document.getElementById("peer_id").value;
     if (username === '' || username === null) {
-        username = Math.floor(Math.random() * 1000);
+        username = Math.floor(Math.random() * 100);
     }
     console.log(username);
     if (peer_id) {
@@ -260,6 +260,7 @@ function getStream() {
     if (window.localStream) {
         window.localStream.getTracks().forEach(function (track) {
             track.stop();
+            // console.log(track);
         });
     }
 
