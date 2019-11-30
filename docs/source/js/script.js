@@ -221,9 +221,9 @@ requestLocalVideo({
         navigator.mediaDevices.enumerateDevices()
             .then(gotDevices).then(getStream).catch(handleError);
         // window.localStream = stream;
-        navigator.mediaDevices.enumerateDevices().then(function (result) {
-            console.log(result);
-        });
+        // navigator.mediaDevices.enumerateDevices().then(function (result) {
+        //     console.log(result);
+        // });
         console.log(navigator.mediaDevices.enumerateDevices()[0]);
         console.log(stream);
         onReceiveStream(stream, 'my-camera');
