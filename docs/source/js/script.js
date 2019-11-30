@@ -16,17 +16,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         host: "p3xx.cf",
         port: 4001,
         path: '/peerjs',
-        debug: 3,
-        config: {
-            'iceServers': [
-                { url: 'stun:stun1.l.google.com:19302' },
-                {
-                    url: 'turn:numb.viagenie.ca',
-                    credential: 'muazkh',
-                    username: 'webrtc@live.com'
-                }
-            ]
-        }
+        debug: 1
     });
 
     // Once the initialization succeeds:
