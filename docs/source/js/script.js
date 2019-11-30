@@ -1,205 +1,294 @@
 // When the DOM is ready
 document.addEventListener("DOMContentLoaded", function(event) {
     var peer_id;
-    var username;
-    var conn;
+var username;
+var conn;
 
-    /**
-     * Important: the host needs to be changed according to your requirements.
-     * e.g if you want to access the Peer server from another device, the
-     * host would be the IP of your host namely 192.xxx.xxx.xx instead
-     * of localhost.
-     *
-     * The iceServers on this example are public and can be used for your project.
-     */
-    var peer = new Peer({
-        host: "p3xx.cf",
-        port: 4001,
-        path: '/',
-        debug: 1
-    });
+var videoElement = document.querySelector('#my-camera');
+var audioSelect = document.querySelector('select#audioSource');
+var videoSelect = document.querySelector('select#videoSource');
+audioSelect.onchange = getStream;
+videoSelect.onchange = getStream;
+/**
+ * Important: the host needs to be changed according to your requirements.
+ * e.g if you want to access the Peer server from another device, the
+ * host would be the IP of your host namely 192.xxx.xxx.xx instead
+ * of localhost.
+ *
+ * The iceServers on this example are public and can be used for your project.
+ */
+var peer;
+console.log(sPath);
 
-    // Once the initialization succeeds:
-    // Show the ID that allows other user to connect to your session.
-    peer.on('open', function () {
-        document.getElementById("peer-id-label").innerHTML = peer.id;
-    });
+peer = new Peer({
+    host: 'p3xx.cf',
+    port: 4001,
+    path: '/',
+    key: 'peerjs',
+    debug: 1
+});
 
-    // When someone connects to your session:
-    //
-    // 1. Hide the peer_id field of the connection form and set automatically its value
-    // as the peer of the user that requested the connection.
-    // 2.
-    peer.on('connection', function (connection) {
-        conn = connection;
-        peer_id = connection.peer;
 
-        // Use the handleMessage to callback when a message comes in
-        conn.on('data', handleMessage);
 
-        // Hide peer_id field and set the incoming peer id as value
-        document.getElementById("peer_id").className += " hidden";
-        document.getElementById("peer_id").value = peer_id;
-        document.getElementById("connected_peer").innerHTML = connection.metadata.username;
-    });
+// Once the initialization succeeds:
+// Show the ID that allows other user to connect to your session.
+peer.on('open', function () {
+    document.getElementById("peer-id-label").innerHTML = peer.id;
+    console.log(peer, peer.id);
+});
 
-    peer.on('error', function(err){
-        alert("An error ocurred with peer: " + err);
-        console.error(err);
-    });
+// When someone connects to your session:
+//
+// 1. Hide the peer_id field of the connection form and set automatically its value
+// as the peer of the user that requested the connection.
+// 2.
+peer.on('connection', function (connection) {
 
-    /**
-     * Handle the on receive call event
-     */
-    peer.on('call', function (call) {
-        var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
+    conn = connection;
+    peer_id = connection.peer;
 
-        if(acceptsCall){
-            // Answer the call with your own video/audio stream
-            call.answer(window.localStream);
+    // Use the handleMessage to callback when a message comes in
+    conn.on('data', handleMessage);
 
-            // Receive data
-            call.on('stream', function (stream) {
-                // Store a global reference of the other user stream
-                window.peer_stream = stream;
-                // Display the stream of the other user in the peer-camera video element !
-                onReceiveStream(stream, 'peer-camera');
-            });
+    // Hide peer_id field and set the incoming peer id as value
+    document.getElementById("peer_id").className += " hidden";
+    document.getElementById("peer_id").value = peer_id;
+    document.getElementById("connected_peer").innerHTML = connection.metadata.username;
+});
 
-            // Handle when the call finishes
-            call.on('close', function(){
-                alert("The videocall has finished");
-            });
+peer.on('error', function (err) {
+    // alert("An error ocurred with peer: " + err);
+    console.error(err);
+});
 
-            // use call.close() to finish a call
-        }else{
-            console.log("Call denied !");
-        }
-    });
+/**
+ * Handle the on receive call event
+ */
+peer.on('call', function (call) {
+    // var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
+    var acceptsCall = true;
 
-    /**
-     * Starts the request of the camera and microphone
-     *
-     * @param {Object} callbacks
-     */
-    function requestLocalVideo(callbacks) {
-        // Monkeypatch for crossbrowser geusermedia
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    if (acceptsCall) {
+        // Answer the call with your own video/audio stream
+        call.answer(window.localStream);
 
-        // Request audio an video
-        navigator.getUserMedia({ audio: true, video: true }, callbacks.success , callbacks.error);
-    }
-
-    /**
-     * Handle the providen stream (video and audio) to the desired video element
-     *
-     * @param {*} stream
-     * @param {*} element_id
-     */
-    function onReceiveStream(stream, element_id) {
-        // Retrieve the video element according to the desired
-        var video = document.getElementById(element_id);
-        // Set the given stream as the video source
-        video.src = window.URL.createObjectURL(stream);
-
-        // Store a global reference of the stream
-        window.peer_stream = stream;
-    }
-
-    /**
-     * Appends the received and sent message to the listview
-     *
-     * @param {Object} data
-     */
-    function handleMessage(data) {
-        var orientation = "text-left";
-
-        // If the message is yours, set text to right !
-        if(data.from == username){
-            orientation = "text-right"
-        }
-
-        var messageHTML =  '<a href="javascript:void(0);" class="list-group-item' + orientation + '">';
-                messageHTML += '<h4 class="list-group-item-heading">'+ data.from +'</h4>';
-                messageHTML += '<p class="list-group-item-text">'+ data.text +'</p>';
-            messageHTML += '</a>';
-
-        document.getElementById("messages").innerHTML += messageHTML;
-    }
-
-    /**
-     * Handle the send message button
-     */
-    document.getElementById("send-message").addEventListener("click", function(){
-        // Get the text to send
-        var text = document.getElementById("message").value;
-
-        // Prepare the data to send
-        var data = {
-            from: username,
-            text: text
-        };
-
-        // Send the message with Peer
-        conn.send(data);
-
-        // Handle the message on the UI
-        handleMessage(data);
-
-        document.getElementById("message").value = "";
-    }, false);
-
-    /**
-     *  Request a videocall the other user
-     */
-    document.getElementById("call").addEventListener("click", function(){
-        console.log('Calling to ' + peer_id);
-        console.log(peer);
-
-        var call = peer.call(peer_id, window.localStream);
-
+        // Receive data
         call.on('stream', function (stream) {
+            console.log(stream);
+            // Store a global reference of the other user stream
             window.peer_stream = stream;
-
+            // Display the stream of the other user in the peer-camera video element !
             onReceiveStream(stream, 'peer-camera');
         });
-    }, false);
 
-    /**
-     * On click the connect button, initialize connection with peer
-     */
-    document.getElementById("connect-to-peer-btn").addEventListener("click", function(){
-        username = document.getElementById("name").value;
-        peer_id = document.getElementById("peer_id").value;
+        // Handle when the call finishes
+        call.on('close', function () {
+            console.log("The videocall has finished");
+        });
 
-        if (peer_id) {
-            conn = peer.connect(peer_id, {
-                metadata: {
-                    'username': username
-                }
-            });
+        // use call.close() to finish a call
+    } else {
+        console.log("Call denied !");
+    }
+});
 
-            conn.on('data', handleMessage);
-        }else{
-            alert("You need to provide a peer to connect with !");
-            return false;
-        }
+/**
+ * Starts the request of the camera and microphone
+ *
+ * @param {Object} callbacks
+ */
+function requestLocalVideo(callbacks) {
+    // Monkeypatch for crossbrowser geusermedia
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-        document.getElementById("chat").className = "";
-        document.getElementById("connection-form").className += " hidden";
-    }, false);
+    // Request audio an video
+    navigator.getUserMedia({
+        audio: true,
+        video: true
+    }, callbacks.success, callbacks.error);
+}
 
-    /**
-     * Initialize application by requesting your own video to test !
-     */
-    requestLocalVideo({
-        success: function(stream){
-            window.localStream = stream;
-            onReceiveStream(stream, 'my-camera');
-        },
-        error: function(err){
-            alert("Cannot get access to your camera and video !");
-            console.error(err);
-        }
+/**
+ * Handle the providen stream (video and audio) to the desired video element
+ *
+ * @param {*} stream
+ * @param {*} element_id
+ */
+function onReceiveStream(stream, element_id) {
+    // Retrieve the video element according to the desired
+    var video = document.getElementById(element_id);
+    // Set the given stream as the video source
+    // video.src = window.URL.createObjectURL(stream);
+    video.srcObject = stream;
+
+    // Store a global reference of the stream
+    window.peer_stream = stream;
+}
+
+/**
+ * Appends the received and sent message to the listview
+ *
+ * @param {Object} data
+ */
+function handleMessage(data) {
+    var orientation = "text-left";
+
+    // If the message is yours, set text to right !
+    if (data.from == username) {
+        orientation = "text-right";
+    }
+
+    var messageHTML = '<a href="javascript:void(0);" class="list-group-item' + orientation + '">';
+    messageHTML += '<h4 class="list-group-item-heading">' + data.from + '</h4>';
+    messageHTML += '<p class="list-group-item-text">' + data.text + '</p>';
+    messageHTML += '</a>';
+
+    document.getElementById("messages").innerHTML += messageHTML;
+}
+
+/**
+ * Handle the send message button
+ */
+document.getElementById("send-message").addEventListener("click", function () {
+    // Get the text to send
+    var text = document.getElementById("message").value;
+
+    // Prepare the data to send
+    var data = {
+        from: username,
+        text: text
+    };
+
+    // Send the message with Peer
+    conn.send(data);
+
+    // Handle the message on the UI
+    handleMessage(data);
+
+    document.getElementById("message").value = "";
+}, false);
+
+/**
+ *  Request a videocall the other user
+ */
+document.getElementById("call").addEventListener("click", function () {
+    console.log('Calling to ' + peer_id);
+    console.log(peer);
+    // peer.disconnected();
+
+    // var call = peer.call(peer_id, videoElement.srcObject);
+    var call = peer.call(peer_id, window.localStream);
+
+    call.on('stream', function (stream) {
+        window.peer_stream = stream;
+
+        onReceiveStream(stream, 'peer-camera');
     });
+}, false);
+
+/**
+ * On click the connect button, initialize connection with peer
+ */
+document.getElementById("connect-to-peer-btn").addEventListener("click", function () {
+    username = document.getElementById("name").value;
+    peer_id = document.getElementById("peer_id").value;
+    if (username === '' || username === null) {
+        username = Math.floor(Math.random() * 1000);
+    }
+    console.log(username);
+    if (peer_id) {
+        conn = peer.connect(peer_id, {
+            metadata: {
+                'username': username
+            }
+        });
+
+        conn.on('data', handleMessage);
+    } else {
+        // alert("You need to provide a peer to connect with !");
+        return false;
+    }
+
+    document.getElementById("chat").className = "";
+    document.getElementById("connection-form").className += " hidden";
+}, false);
+
+/**
+ * Initialize application by requesting your own video to test !
+ */
+requestLocalVideo({
+    success: function (stream) {
+        navigator.mediaDevices.enumerateDevices()
+            .then(gotDevices).then(getStream).catch(handleError);
+        // window.localStream = stream;
+        navigator.mediaDevices.enumerateDevices().then(function (result) {
+            console.log(result);
+        });
+        console.log(navigator.mediaDevices.enumerateDevices()[0]);
+        console.log(stream);
+        onReceiveStream(stream, 'my-camera');
+
+    },
+    error: function (err) {
+        // alert("Cannot get access to your camera and video !");
+        console.error(err);
+    }
+});
+
+
+
+function gotDevices(deviceInfos) {
+    for (var i = 0; i !== deviceInfos.length; ++i) {
+        var deviceInfo = deviceInfos[i];
+        var option = document.createElement('option');
+        option.value = deviceInfo.deviceId;
+        if (deviceInfo.kind === 'audioinput') {
+            option.text = deviceInfo.label ||
+                'microphone ' + (audioSelect.length + 1);
+            audioSelect.appendChild(option);
+        } else if (deviceInfo.kind === 'videoinput') {
+            option.text = deviceInfo.label || 'camera ' +
+                (videoSelect.length + 1);
+            videoSelect.appendChild(option);
+        } else {
+            console.log('Found one other kind of source/device: ', deviceInfo);
+        }
+    }
+}
+
+function getStream() {
+    if (window.localStream) {
+        window.localStream.getTracks().forEach(function (track) {
+            track.stop();
+        });
+    }
+
+    var constraints = {
+        audio: {
+            deviceId: {
+                exact: audioSelect.value
+            }
+        },
+        video: {
+            deviceId: {
+                exact: videoSelect.value
+            }
+        }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints).
+    then(gotStream).catch(handleError);
+}
+
+function gotStream(stream) {
+    window.stream = stream; // make stream available to console
+    window.localStream = stream;
+    videoElement.srcObject = stream;
+    console.log(stream);
+    return stream;
+}
+
+function handleError(error) {
+    console.log('Error: ', error);
+}
 }, false);
