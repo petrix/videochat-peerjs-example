@@ -18,7 +18,7 @@ videoSelect.onchange = getStream;
  * The iceServers on this example are public and can be used for your project.
  */
 var peer;
-console.log(sPath);
+// console.log(sPath);
 
 peer = new Peer({
     host: 'p3xx.cf',
