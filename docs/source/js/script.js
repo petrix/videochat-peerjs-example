@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var peer = new Peer({
         host: "p3xx.cf",
         port: 4001,
-        path: '/peerjs',
+        path: '/',
         debug: 1
     });
 
